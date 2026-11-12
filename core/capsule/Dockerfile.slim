@@ -1,0 +1,15 @@
+# Капсула С.І.Д. на debian:12-slim (варіант рівня 2 з ЛР2).
+# У ЛР3 цей образ грає роль agent: він худий, але в ньому є sh.
+# Контекст збірки це корінь vtfk-sid.
+FROM rust:1.79 AS build
+WORKDIR /app
+# 1) спершу тільки маніфест і lock, залежності збираються окремим шаром
+COPY core/sid/Cargo.toml core/sid/Cargo.lock ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release && rm -rf src
+# 2) потім прикладний код, його зміна ламає кеш тільки звідси
+COPY core/sid/ ./
+RUN touch src/main.rs && cargo build --release
+
+FROM debian:12-slim
+COPY --from=build /app/target/release/vtfk-sid /usr/local/bin/vtfk-sid
+CMD ["vtfk-sid"]
