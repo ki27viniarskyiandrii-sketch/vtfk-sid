@@ -34,3 +34,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Ключ відмички, який пише sidkit (ЛР4)
+core/sidkit/volume/
